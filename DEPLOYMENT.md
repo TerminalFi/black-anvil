@@ -9,7 +9,11 @@
 Create a `.env.local` file in the root directory with the following variables:
 
 ```env
-# reCAPTCHA v3 keys
+# CrispForms endpoint (Required)
+# Get your form endpoint at: https://crispforms.com/
+NEXT_PUBLIC_CRISPFORMS_ENDPOINT=https://crispforms.com/api/forms/your_form_id
+
+# reCAPTCHA v3 keys (Optional - provides additional spam protection)
 # Get your keys at: https://www.google.com/recaptcha/admin
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your_site_key_here
 RECAPTCHA_SECRET_KEY=your_secret_key_here
@@ -58,16 +62,20 @@ This is a standard Next.js 16 application and can be deployed to:
 
 ## Post-Deployment Tasks
 
-1. **Set up reCAPTCHA**:
+1. **Set up CrispForms**:
+   - Sign up at [CrispForms](https://crispforms.com/)
+   - Create a new form for contact submissions
+   - Configure form fields (name, email, company, message)
+   - Copy your form endpoint URL
+   - Add the endpoint to your environment variables
+   - Configure email notifications and integrations
+
+2. **(Optional) Set up reCAPTCHA**:
    - Go to [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
    - Create a new site with reCAPTCHA v3
    - Add your domain to the allowed domains
    - Copy the site key and secret key to your environment variables
-
-2. **Configure Contact Form**:
-   - Update `app/api/contact/route.ts` to integrate with your email service (SendGrid, Resend, etc.)
-   - Or connect to your CRM system
-   - Or save to a database
+   - This provides an additional layer of spam protection
 
 3. **Update Content**:
    - Edit `app/page.tsx` to customize services, about section, and other content

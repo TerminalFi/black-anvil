@@ -18,33 +18,43 @@ export default function ContactForm() {
     setErrorMessage('');
 
     try {
-      // Check if reCAPTCHA is loaded
-      if (!window.grecaptcha || !window.grecaptcha.execute) {
-        throw new Error('reCAPTCHA not loaded. Please refresh the page and try again.');
+      // Get CrispForms endpoint from environment variable
+      const crispFormsEndpoint = process.env.NEXT_PUBLIC_CRISPFORMS_ENDPOINT;
+      
+      if (!crispFormsEndpoint) {
+        // Fallback to existing API if CrispForms not configured
+        throw new Error('Form endpoint not configured. Please contact the site administrator.');
       }
 
-      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-      if (!siteKey) {
-        throw new Error('reCAPTCHA is not configured. Please contact the site administrator.');
+      // Prepare form data for CrispForms
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('company', formData.company || '');
+      formDataToSend.append('message', formData.message);
+
+      // Optional: Add reCAPTCHA token if available
+      if (window.grecaptcha && window.grecaptcha.execute) {
+        const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+        if (siteKey) {
+          try {
+            const token = await window.grecaptcha.execute(siteKey, { action: 'contact_form' });
+            formDataToSend.append('g-recaptcha-response', token);
+          } catch (err) {
+            console.warn('reCAPTCHA execution failed:', err);
+            // Continue without reCAPTCHA
+          }
+        }
       }
 
-      // Execute reCAPTCHA v3
-      const token = await window.grecaptcha.execute(siteKey, { action: 'contact_form' });
-
-      const response = await fetch('/api/contact', {
+      // Submit to CrispForms
+      const response = await fetch(crispFormsEndpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          recaptchaToken: token,
-        }),
+        body: formDataToSend,
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to submit form');
+        throw new Error('Failed to submit form. Please try again.');
       }
 
       setStatus('success');
@@ -123,7 +133,7 @@ export default function ContactForm() {
           value={formData.message}
           onChange={handleChange}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none"
-          placeholder="Tell us about your project..."
+          placeholder="Tell us about your security assessment needs..."
         />
       </div>
 
@@ -136,7 +146,7 @@ export default function ContactForm() {
       {status === 'success' && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
           <p className="text-sm text-green-800">
-            Thank you for your message! We'll get back to you soon.
+            Thank you for your message! We'll get back to you soon to discuss your security assessment.
           </p>
         </div>
       )}
@@ -150,15 +160,24 @@ export default function ContactForm() {
       </button>
 
       <p className="text-xs text-gray-500 text-center">
-        This site is protected by reCAPTCHA and the Google{' '}
-        <a href="https://policies.google.com/privacy" className="underline hover:text-gray-700" target="_blank" rel="noopener noreferrer">
-          Privacy Policy
-        </a>{' '}
-        and{' '}
-        <a href="https://policies.google.com/terms" className="underline hover:text-gray-700" target="_blank" rel="noopener noreferrer">
-          Terms of Service
-        </a>{' '}
-        apply.
+        This form is powered by{' '}
+        <a href="https://crispforms.com/" className="underline hover:text-gray-700" target="_blank" rel="noopener noreferrer">
+          CrispForms
+        </a>
+        {'. '}
+        {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+          <>
+            Protected by reCAPTCHA and the Google{' '}
+            <a href="https://policies.google.com/privacy" className="underline hover:text-gray-700" target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+            </a>{' '}
+            and{' '}
+            <a href="https://policies.google.com/terms" className="underline hover:text-gray-700" target="_blank" rel="noopener noreferrer">
+              Terms of Service
+            </a>{' '}
+            apply.
+          </>
+        )}
       </p>
     </form>
   );
