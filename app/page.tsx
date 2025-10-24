@@ -1,5 +1,6 @@
 import Script from 'next/script';
 import ContactForm from '@/components/ContactForm';
+import Logo from '@/components/Logo';
 
 export default function Home() {
   return (
@@ -16,7 +17,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <h1 className="text-2xl font-bold text-primary-900">Black Anvil</h1>
+                <Logo />
               </div>
               <div className="hidden md:flex space-x-8">
                 <a href="#services" className="text-gray-700 hover:text-primary-700 transition-colors">Services</a>
@@ -208,7 +209,9 @@ export default function Home() {
         <footer className="bg-primary-900 text-white py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h4 className="text-2xl font-bold mb-4">Black Anvil</h4>
+              <div className="flex justify-center mb-4">
+                <Logo className="brightness-0 invert" />
+              </div>
               <p className="text-primary-300 mb-6">
                 Forging Digital Excellence
               </p>
