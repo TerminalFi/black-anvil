@@ -81,7 +81,7 @@ black-anvil/
 
 ### Colors
 
-The color scheme is defined in `app/globals.css` using Tailwind v4's `@theme` directive. The current palette uses muted blues and grays for a professional look.
+The color scheme is defined in `tailwind.config.ts` using a custom color palette extension. The current palette uses muted slate/grays for a professional look.
 
 ### Content
 

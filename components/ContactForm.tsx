@@ -18,11 +18,18 @@ export default function ContactForm() {
     setErrorMessage('');
 
     try {
+      // Check if reCAPTCHA is loaded
+      if (!window.grecaptcha || !window.grecaptcha.execute) {
+        throw new Error('reCAPTCHA not loaded. Please refresh the page and try again.');
+      }
+
+      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+      if (!siteKey) {
+        throw new Error('reCAPTCHA is not configured. Please contact the site administrator.');
+      }
+
       // Execute reCAPTCHA v3
-      const token = await window.grecaptcha.execute(
-        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
-        { action: 'contact_form' }
-      );
+      const token = await window.grecaptcha.execute(siteKey, { action: 'contact_form' });
 
       const response = await fetch('/api/contact', {
         method: 'POST',
